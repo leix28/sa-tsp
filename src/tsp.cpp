@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cmath>
 #include <ctime>
+#include <algorithm>
 #define START_T 1000.0    //start temperature
 #define END_T 1e-4        //terminte temperature
 #define DECEND 0.8        //decend factor of temperature
