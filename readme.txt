@@ -22,7 +22,7 @@ It probably works under other operating systems.
 ./tsp
 
 - file I/O
-./tsp [input file name] [output file name]
+./tsp [input file name] [input file name]
 Example: ./tsp input1.txt input2.txt input3.txt
 
 --------------
