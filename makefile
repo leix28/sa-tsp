@@ -7,4 +7,7 @@ else
 endif
 
 all: src/tsp.cpp
-	${CXX} src/tsp.cpp ${CXXFLAGS} -o bin/tsp
+	${CXX} src/tsp.cpp ${CXXFLAGS} -o tsp
+
+debug: src/tsp.cpp
+	${CXX} -g src/tsp.cpp -o tsp

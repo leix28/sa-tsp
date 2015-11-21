@@ -5,17 +5,21 @@
 #include <cmath>
 #include <ctime>
 #include <algorithm>
+#include <vector>
+#include <ctime>
+
 #define START_T 1000.0    //start temperature
 #define END_T 1e-4        //terminte temperature
 #define DECEND 0.8        //decend factor of temperature
 #define LOOP 10000        //loop in each temperature
 using namespace std;
 
-pair<double, double> pos[30];
-double dis[30][30];             //all x to y distance
-string id2name[30];
-pair<int, int> actlist[1000];   //create a list of all possible swaps
-int n, m, current[30];
+pair<double, double>* pos;
+double** dis;             //all x to y distance
+std::vector<std::string> id2name;
+pair<int, int>* actlist;   //create a list of all possible swaps
+int n, m;
+int* current;
 double currentv;
 
 
@@ -38,15 +42,32 @@ double sqr(double x) {return x * x; }
 double calcdis(pair<double, double> &a, pair<double, double> &b) {
   return sqrt(sqr(a.first - b.first) + sqr(a.second - b.second));
 }
+				
+double calcPseudoEuclideanDistance(pair<double, double> &a, pair<double, double> &b){
+	double distance = sqrt((sqr(a.first - b.first) + sqr(a.second - b.second))/10);
+	double tij = ceil(distance);
+	if(tij < distance) distance = tij + 1;
+	else distance = tij;
+	return distance;
+}
 
 void init() {
-
+	pos = (pair<double, double>*) malloc(sizeof(pair<double,double>) * n);
+	dis = (double**) malloc(sizeof(double*) * n);
+	actlist = (pair<int, int>*) malloc(sizeof(pair<int, int>) * n * n);
+	current = (int*) malloc(sizeof(int)*n);
+	m = 0;
+	currentv = 0;
+	
+	for(int i = 0; i < n; i++) dis[i] = (double*) malloc(sizeof(double) * n);
+	
+	
   //read position information
   for (int i = 0; i < n; i++) {
     string name;
     double x, y;
     cin >> name >> x >> y;
-    id2name[i] = name;
+    id2name.push_back(name);
     pos[i] = make_pair(x, y);
   }
 
@@ -88,6 +109,11 @@ void random_update(double t) {
 void sa() {
   //main Simulated Annealing loop
   double t = START_T;
+  
+  clock_t begin, end;
+	double time_spent;
+	
+	begin = clock();
 
   while (t > END_T) {
 
@@ -95,20 +121,52 @@ void sa() {
       random_update(t);
 
     t *= DECEND;
-    for (int i = 0; i < n; i++)
-      printf("%s ", id2name[current[i]].c_str());
-    printf("%.8lf\n", currentv);
+    
   }
+  
+  end = clock();
+  time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    
+  printf("%.8lf\t%lf\n", currentv, time_spent);
+  
 }
 
 int main(int argc, char **argv) {
-  if (argc == 3) {
-    freopen(argv[1], "r", stdin);
-    freopen(argv[2], "w", stdout);
-  }
-  scanf("%d", &n);
 
-  init();
+	//ignore first 3 lines
+	unsigned int i, j;
+	for(j = 1;  j < argc; j++){
+		i = 0;
+		printf("%s\t", argv[j]);
+		freopen(argv[j], "r", stdin);
+		
+		while(i < 3){
+			if(getchar() == '\n') i++;
+		}
 
-  sa();
+		scanf("DIMENSION: %d", &n);
+
+		//ignore next 2 lines
+		i = 0;
+		while(i < 3){
+			if(getchar() == '\n') i++;
+		}
+
+		init();
+
+		sa();
+		
+		//destroy
+		free(pos);
+	 	for(i = 0; i < n; i++) free(dis[i]);
+	 	free(dis);
+		free(actlist);
+		free(current);
+		id2name.clear();
+	}
+	
+	
+	  
+  return 0;
 }
+
